@@ -46,8 +46,8 @@ class RivenRequester:
 
         return {"success": 0, "failed": 0, "results": []}
     
-    def _get_unknown_items(self, media_type: str) -> Dict[str, str]:
-        """Get all items in 'Unknown' state from Riven
+    def _get_existing_items(self, media_type: str) -> Dict[str, str]:
+        """Get all existing items from Riven (any state)
 
         Returns:
             Dictionary mapping tmdb_id -> riven internal id
@@ -59,7 +59,6 @@ class RivenRequester:
                 "limit": 500,
                 "page": 1,
                 "type": media_type,
-                "states": "Unknown",
                 "extended": "false",
                 "count_only": "false"
             }
@@ -72,11 +71,11 @@ class RivenRequester:
                 # Map tmdb_id -> internal id
                 return {str(item.get("tmdb_id")): str(item.get("id")) for item in items if item.get("tmdb_id")}
             else:
-                logger.warning(f"Failed to get Unknown items: {response.status_code}")
+                logger.warning(f"Failed to get existing items: {response.status_code}")
                 return {}
 
         except Exception as e:
-            logger.error(f"Error getting Unknown items: {str(e)}")
+            logger.error(f"Error getting existing items: {str(e)}")
             return {}
 
     def _remove_items(self, item_ids: List[str]) -> bool:
@@ -133,13 +132,13 @@ class RivenRequester:
                 logger.warning(f"No TMDB IDs found for {media_type}s")
                 return {"success": 0, "failed": len(releases), "results": []}
 
-            # Check for existing items in Unknown state and remove them
-            unknown_items = self._get_unknown_items(media_type)
+            # Check for existing items in any state and remove them for re-request
+            existing_items = self._get_existing_items(media_type)
             items_to_remove = []
             for tmdb_id in tmdb_ids:
-                if tmdb_id in unknown_items:
-                    items_to_remove.append(unknown_items[tmdb_id])
-                    logger.info(f"Found existing Unknown item with TMDB ID {tmdb_id}, will re-request")
+                if tmdb_id in existing_items:
+                    items_to_remove.append(existing_items[tmdb_id])
+                    logger.info(f"Found existing item with TMDB ID {tmdb_id}, will remove and re-request")
 
             if items_to_remove:
                 self._remove_items(items_to_remove)
