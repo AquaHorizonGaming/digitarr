@@ -24,11 +24,14 @@ services:
       - RIVEN_API_KEY=
 
       # =================================================================
-      # Release Source Configuration
-      # Options: "tmdb" or "dvdsreleasedates"
+      # Release Source Configuration Options:
+      #   - tmdb
+      #   - dvd (same as dvdsreleasedates)
+      #   - dvdsreleasedates (same as dvd)
       # dvdsreleasedates.com may have more accurate digital release dates
       # =================================================================
       - RELEASE_SOURCE=tmdb
+
 
       # =================================================================
       # Filter Configuration
