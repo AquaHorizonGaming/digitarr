@@ -139,7 +139,7 @@ def main():
         release_source = config.get("release_source", "tmdb").lower()
         tmdb_api_key = config.get("tmdb", {}).get("api_key")
 
-        if release_source == "dvdsreleasedates":
+        if release_source in ("dvdsreleasedates", "dvd"):
             logger.info("Using dvdsreleasedates.com as release source")
             dvd_checker = DVDReleaseChecker(tmdb_api_key)
             # Wrap in a simple adapter that matches the ReleaseChecker interface
